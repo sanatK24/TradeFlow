@@ -61,7 +61,7 @@ const OrderEntry = ({ selectedBond, presetPrice, presetQty, presetSide, onOrderS
     }
 
     try {
-      const res = await fetch("http://localhost:8000/api/v1/orders/", {
+      const res = await fetch("http://localhost:8001/api/v1/orders/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

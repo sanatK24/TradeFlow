@@ -39,7 +39,7 @@ const TradeBlotter = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/v1/trades/", {
+      const res = await fetch("http://localhost:8001/api/v1/trades/", {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {

@@ -15,7 +15,7 @@ const OrderBook = ({ bonds, selectedBond, setSelectedBond, onSelectPriceSize }) 
     const fetchOrderBook = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://localhost:8000/api/v1/bonds/${selectedBond.id}/order-book`, {
+        const res = await fetch(`http://localhost:8001/api/v1/bonds/${selectedBond.id}/order-book`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

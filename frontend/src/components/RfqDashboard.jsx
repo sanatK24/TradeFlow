@@ -67,7 +67,7 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
   const fetchClientRfqs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/v1/rfqs/", {
+      const res = await fetch("http://localhost:8001/api/v1/rfqs/", {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -82,7 +82,7 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
   const fetchIncomingRfqs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/v1/rfqs/incoming", {
+      const res = await fetch("http://localhost:8001/api/v1/rfqs/incoming", {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -151,7 +151,7 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
 
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:8000/api/v1/rfqs/", {
+      const res = await fetch("http://localhost:8001/api/v1/rfqs/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -182,7 +182,7 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
   const handleAcceptQuote = async (rfqId, quoteId) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/rfqs/${rfqId}/accept`, {
+      const res = await fetch(`http://localhost:8001/api/v1/rfqs/${rfqId}/accept`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -210,7 +210,7 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/rfqs/${rfqId}/quote`, {
+      const res = await fetch(`http://localhost:8001/api/v1/rfqs/${rfqId}/quote`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
