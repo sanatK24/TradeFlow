@@ -70,6 +70,7 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
   // Status states
   const [quotedDealerId, setQuotedDealerId] = useState(null); // which dealer we quoted for
   const [quoteMessage, setQuoteMessage] = useState(null); // message during dealer quote submission
+  const [historyRfqs, setHistoryRfqs] = useState([]); // past bot client RFQs
   
   // Sound/Alert triggers
   const [newRfqAlert, setNewRfqAlert] = useState(false);
@@ -105,6 +106,21 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
     }
   };
 
+  const fetchHistoryRfqs = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:8001/api/v1/rfqs/incoming/history", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHistoryRfqs(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (bonds.length > 0 && !bondId) {
       setBondId(bonds[0].id.toString());
@@ -114,6 +130,7 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
   useEffect(() => {
     fetchClientRfqs();
     fetchIncomingRfqs();
+    fetchHistoryRfqs();
 
     // WS subscriptions
     // 1. Client Mode: quotes arrived
@@ -132,17 +149,20 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
     const unsubscribeOutcome = subscribe("rfq_accepted", (data) => {
       fetchIncomingRfqs();
       fetchClientRfqs();
+      fetchHistoryRfqs();
       if (onTradeExecuted) onTradeExecuted();
     });
 
     const unsubscribeRejected = subscribe("rfq_rejected", (data) => {
       fetchIncomingRfqs();
       fetchClientRfqs();
+      fetchHistoryRfqs();
     });
 
     const unsubscribeExpired = subscribe("rfq_expired", (data) => {
       fetchIncomingRfqs();
       fetchClientRfqs();
+      fetchHistoryRfqs();
     });
 
     return () => {
@@ -563,6 +583,101 @@ const RfqDashboard = ({ bonds, activeRole, onTradeExecuted }) => {
                 </div>
               );
             })}
+          </div>
+          
+          {/* Dealer RFQ History Section */}
+          <div style={{ marginTop: "40px", borderTop: "1px solid var(--surface-border)", paddingTop: "30px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h3 style={{ fontSize: "1.1rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)", margin: 0 }}>
+                Dealer RFQ History
+              </h3>
+              <button className="btn btn-secondary" style={{ padding: "4px 8px" }} onClick={fetchHistoryRfqs}>
+                <RefreshCw size={12} />
+              </button>
+            </div>
+
+            <div className="glass-panel" style={{ padding: "20px", overflowX: "auto" }}>
+              {historyRfqs.length === 0 ? (
+                <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "20px" }}>
+                  No historical dealer RFQs found.
+                </div>
+              ) : (
+                <table className="table" style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--surface-border)", textAlign: "left" }}>
+                      <th style={{ padding: "12px 8px" }}>Client</th>
+                      <th style={{ padding: "12px 8px" }}>Security</th>
+                      <th style={{ padding: "12px 8px" }}>Side</th>
+                      <th style={{ padding: "12px 8px" }}>Quantity</th>
+                      <th style={{ padding: "12px 8px" }}>Your Quote</th>
+                      <th style={{ padding: "12px 8px" }}>Winning Price</th>
+                      <th style={{ padding: "12px 8px" }}>Outcome</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historyRfqs.map((rfq) => {
+                      const clientName = INSTITUTIONAL_CLIENTS[rfq.id % INSTITUTIONAL_CLIENTS.length];
+                      const userQuote = rfq.quotes?.find(q => q.dealer_name.startsWith("User_"));
+                      
+                      let outcomeColor = "var(--text-muted)";
+                      let outcomeText = rfq.status;
+                      let winningPriceText = "-";
+
+                      // Find the best quote (lowest for BUY, highest for SELL)
+                      const sorted = [...(rfq.quotes || [])].sort((a, b) => {
+                        return rfq.side === "BUY" ? a.price - b.price : b.price - a.price;
+                      });
+                      const winner = sorted[0];
+                      if (winner) {
+                        winningPriceText = winner.price.toFixed(3);
+                      }
+
+                      if (rfq.status === "ACCEPTED") {
+                        if (winner) {
+                          if (winner.dealer_name.startsWith("User_")) {
+                            outcomeText = "WON";
+                            outcomeColor = "var(--success)";
+                          } else {
+                            outcomeText = `LOST (${winner.dealer_name})`;
+                            outcomeColor = "var(--danger)";
+                          }
+                        } else {
+                          outcomeText = "ACCEPTED";
+                        }
+                      } else if (rfq.status === "REJECTED") {
+                        outcomeText = "REJECTED";
+                        outcomeColor = "var(--danger)";
+                      } else if (rfq.status === "EXPIRED") {
+                        outcomeText = "EXPIRED";
+                        outcomeColor = "var(--text-muted)";
+                      }
+
+                      return (
+                        <tr key={rfq.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                          <td style={{ padding: "12px 8px", fontWeight: 600 }}>{clientName}</td>
+                          <td style={{ padding: "12px 8px" }}>{rfq.bond?.ticker}</td>
+                          <td style={{ padding: "12px 8px" }}>
+                            <span className={`badge ${rfq.side === "BUY" ? "badge-bid" : "badge-ask"}`}>
+                              {rfq.side}
+                            </span>
+                          </td>
+                          <td style={{ padding: "12px 8px" }}>{rfq.quantity.toLocaleString()}</td>
+                          <td style={{ padding: "12px 8px", fontFamily: "monospace" }}>
+                            {userQuote ? userQuote.price.toFixed(3) : "-"}
+                          </td>
+                          <td style={{ padding: "12px 8px", fontFamily: "monospace" }}>
+                            {winningPriceText}
+                          </td>
+                          <td style={{ padding: "12px 8px", fontWeight: 600, color: outcomeColor }}>
+                            {outcomeText}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         </div>
       )}

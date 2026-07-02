@@ -70,6 +70,19 @@ def get_incoming_rfqs(
     ).order_by(RFQ.created_at.desc()).all()
     return rfqs
 
+@router.get("/incoming/history", response_model=List[RfqResponse])
+def get_incoming_rfqs_history(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Dealer Mode: Fetch historical client RFQs (completed, expired, or rejected)."""
+    now = datetime.utcnow()
+    rfqs = db.query(RFQ).filter(
+        RFQ.client_id == 0, # bot client
+        (RFQ.status != RfqStatus.REQUESTED) | (RFQ.expires_at <= now)
+    ).order_by(RFQ.created_at.desc()).limit(15).all()
+    return rfqs
+
 @router.get("/{rfq_id}", response_model=RfqResponse)
 def get_rfq_details(
     rfq_id: int,
