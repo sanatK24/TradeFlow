@@ -2,6 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useWebSocket } from "../context/WebSocketContext";
 import { Send, Check, AlertTriangle, Clock, RefreshCw } from "lucide-react";
 
+const INSTITUTIONAL_CLIENTS = [
+  "BlackRock",
+  "PIMCO",
+  "Vanguard",
+  "Fidelity",
+  "State Street",
+  "Capital Group",
+  "AllianceBernstein",
+  "Wellington Management"
+];
+
 // Helper component for ticking countdown timers
 const TimerBadge = ({ expiresAt, onExpire }) => {
   const [secondsLeft, setSecondsLeft] = useState(0);
