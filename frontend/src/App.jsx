@@ -298,58 +298,54 @@ const AppContent = () => {
         pnl={pnl}
       />
 
-      <main className="main-content">
-        {activeTab === "client" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px", flex: 1 }}>
-            {/* Top Row: L2 Book + Order Ticket */}
-            <div className="dashboard-grid" style={{ marginBottom: 0 }}>
-              <OrderBook 
-                bonds={bonds} 
-                selectedBond={selectedBond} 
-                setSelectedBond={setSelectedBond} 
-                onSelectPriceSize={handleSelectPriceSize}
-              />
-              <OrderEntry 
-                selectedBond={selectedBond} 
-                presetPrice={presetPrice}
-                presetQty={presetQty}
-                presetSide={presetSide}
-                onOrderSubmitted={handleOrderSubmitted}
-              />
-            </div>
-            
-            {/* Bottom Row: Client RFQ Panel */}
-            <div className="glass-panel" style={{ padding: "20px", display: "flex", flexDirection: "column" }}>
-              <RfqDashboard 
-                bonds={bonds} 
-                activeRole="client" 
-                onTradeExecuted={handleOrderSubmitted}
-              />
-            </div>
+      <main className="main-content" style={{ display: "flex", flex: 1, position: "relative" }}>
+        {/* Client Desk Tab */}
+        <div style={{ display: activeTab === "client" ? "flex" : "none", flexDirection: "column", gap: "24px", flex: 1 }}>
+          {/* Top Row: L2 Book + Order Ticket */}
+          <div className="dashboard-grid" style={{ marginBottom: 0 }}>
+            <OrderBook 
+              bonds={bonds} 
+              selectedBond={selectedBond} 
+              setSelectedBond={setSelectedBond} 
+              onSelectPriceSize={handleSelectPriceSize}
+            />
+            <OrderEntry 
+              selectedBond={selectedBond} 
+              presetPrice={presetPrice}
+              presetQty={presetQty}
+              presetSide={presetSide}
+              onOrderSubmitted={handleOrderSubmitted}
+            />
           </div>
-        )}
-
-        {activeTab === "dealer" && (
-          <div className="glass-panel" style={{ padding: "20px", display: "flex", flexDirection: "column", flex: 1 }}>
+          
+          {/* Bottom Row: Client RFQ Panel */}
+          <div className="glass-panel" style={{ padding: "20px", display: "flex", flexDirection: "column" }}>
             <RfqDashboard 
               bonds={bonds} 
-              activeRole="dealer" 
+              activeRole="client" 
               onTradeExecuted={handleOrderSubmitted}
             />
           </div>
-        )}
+        </div>
 
-        {activeTab === "blotter" && (
-          <div className="glass-panel" style={{ padding: "20px", display: "flex", flexDirection: "column", flex: 1 }}>
-            <TradeBlotter />
-          </div>
-        )}
+        {/* Dealer Desk Tab */}
+        <div className="glass-panel" style={{ display: activeTab === "dealer" ? "flex" : "none", padding: "20px", flexDirection: "column", flex: 1 }}>
+          <RfqDashboard 
+            bonds={bonds} 
+            activeRole="dealer" 
+            onTradeExecuted={handleOrderSubmitted}
+          />
+        </div>
 
-        {activeTab === "analytics" && (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <AnalyticsDashboard />
-          </div>
-        )}
+        {/* Trade Blotter Tab */}
+        <div className="glass-panel" style={{ display: activeTab === "blotter" ? "flex" : "none", padding: "20px", flexDirection: "column", flex: 1 }}>
+          <TradeBlotter />
+        </div>
+
+        {/* Analytics Tab */}
+        <div style={{ display: activeTab === "analytics" ? "flex" : "none", flex: 1, flexDirection: "column" }}>
+          <AnalyticsDashboard />
+        </div>
       </main>
     </div>
   );
