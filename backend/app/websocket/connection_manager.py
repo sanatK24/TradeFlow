@@ -49,13 +49,26 @@ class ConnectionManager:
                     self.disconnect(websocket, user_id)
 
     async def broadcast(self, message: dict):
-        """Broadcasts a JSON message to all connected WebSocket clients."""
+        """Broadcasts a JSON message to all connected WebSocket clients (via Redis Pub/Sub if active)."""
+        from backend.app.services.redis_service import redis_service
+        if redis_service.is_active and redis_service.client:
+            try:
+                redis_service.client.publish("websocket_broadcast", json.dumps(message))
+                return
+            except Exception as e:
+                logger.warning(f"Failed to publish broadcast to Redis Pub/Sub: {e}")
+
+        # Fallback to local broadcast
+        await self._broadcast_local(message)
+
+    async def _broadcast_local(self, message: dict):
+        """Broadcasts a JSON message to this server node's local WebSocket connections."""
         websockets = list(self.active_connections)
         for websocket in websockets:
             try:
                 await websocket.send_json(message)
             except Exception as e:
-                logger.warning(f"Error broadcasting message: {e}")
+                logger.warning(f"Error broadcasting message locally: {e}")
                 if websocket in self.active_connections:
                     self.active_connections.remove(websocket)
 

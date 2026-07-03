@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from backend.app.database import SessionLocal
 from backend.app.models import Bond, Order, OrderStatus
 from backend.app.websocket.connection_manager import manager
+from backend.app.services.redis_service import redis_service
 
 logger = logging.getLogger(__name__)
 
@@ -147,6 +148,7 @@ class MarketDataSimulator:
             self.bond_tickers[b.ticker] = b.id
             if b.id not in self.order_books:
                 self.order_books[b.id] = {"bids": [], "asks": []}
+            redis_service.set_cache(f"order_book:{b.id}", {"bids": [], "asks": []})
 
     def start(self):
         self._running = True
@@ -208,6 +210,10 @@ class MarketDataSimulator:
                         "bids": bids,
                         "asks": asks
                     }
+                    redis_service.set_cache(f"order_book:{bond.id}", {
+                        "bids": bids,
+                        "asks": asks
+                    })
                     
                     # 3. Simulate hitting user pending orders
                     # If any user LIMIT BUY is at or above our ask, or LIMIT SELL at or below our bid, match it.

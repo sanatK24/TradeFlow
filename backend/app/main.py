@@ -12,6 +12,7 @@ from backend.app.websocket.connection_manager import manager
 from backend.app.services.market_data_simulator import market_simulator
 from backend.app.services.settlement_service import settlement_service
 from backend.app.services.rfq_manager import rfq_manager
+from backend.app.services.redis_service import redis_service
 
 # Configure logging
 logging.basicConfig(
@@ -76,6 +77,9 @@ def startup_event():
     market_simulator.start()
     settlement_service.start()
     rfq_manager.start()
+    
+    # 4. Start Redis pub/sub listener (if Redis is active)
+    redis_service.start_pubsub_listener()
 
 @app.on_event("shutdown")
 def shutdown_event():

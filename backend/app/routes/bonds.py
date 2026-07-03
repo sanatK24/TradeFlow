@@ -7,6 +7,8 @@ from backend.app.schemas import BondResponse
 from backend.app.services.market_data_simulator import market_simulator
 from backend.app.routes.auth import get_current_user
 
+from backend.app.services.redis_service import redis_service
+
 router = APIRouter(prefix="/bonds", tags=["Bonds"])
 
 @router.get("/", response_model=List[BondResponse])
@@ -30,7 +32,7 @@ def get_bond_order_book(bond_id: int, db: Session = Depends(get_db), current_use
     if not bond:
         raise HTTPException(status_code=404, detail="Bond not found")
         
-    book = market_simulator.order_books.get(bond_id, {"bids": [], "asks": []})
+    book = redis_service.get_cache(f"order_book:{bond_id}", {"bids": [], "asks": []})
     return {
         "bond_id": bond.id,
         "ticker": bond.ticker,
