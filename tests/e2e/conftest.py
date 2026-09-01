@@ -28,6 +28,7 @@ def register_and_login():
         
         # The frontend clears the password field, so we must refill it before logging in.
         page.locator("input[type='password']").fill("password123")
+        page.wait_for_timeout(500) # Give React's async state update a tick to process the password
         page.locator("button:has-text('Open Blotter')").click()
         
         # Wait for trading desk to load

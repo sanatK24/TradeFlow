@@ -18,6 +18,7 @@ def test_register_new_trader(page, base_url):
     page.locator("button:has-text('Open Blotter')").wait_for(state="visible")
     # password is cleared by frontend, so we refill it
     page.locator("input[type='password']").fill("password123")
+    page.wait_for_timeout(500) # Give React's async state update a tick to process the password
     page.locator("button:has-text('Open Blotter')").click()
     
     page.wait_for_timeout(2000)
