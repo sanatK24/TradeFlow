@@ -12,5 +12,13 @@ frontend/.cache/
 # Databases & local files
 *.db
 backend/tradeflow.db
+test_tradeflow.db
 .env
 .DS_Store
+
+# Test artifacts
+coverage-report/
+coverage.xml
+.coverage
+htmlcov/
+test-results/

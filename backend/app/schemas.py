@@ -53,7 +53,7 @@ class OrderCreate(BaseModel):
     side: str  # BUY or SELL
     type: str  # LIMIT or MARKET
     price: float  # Clean price % (e.g. 99.5)
-    quantity: int
+    quantity: int = Field(..., gt=0, description="Quantity must be strictly positive")
 
 class OrderResponse(BaseModel):
     id: int
@@ -93,7 +93,7 @@ class QuoteResponse(BaseModel):
 class RfqCreate(BaseModel):
     bond_id: int
     side: str  # BUY or SELL (relative to the client)
-    quantity: int
+    quantity: int = Field(..., gt=0, description="Quantity must be strictly positive")
 
 class RfqResponse(BaseModel):
     id: int
