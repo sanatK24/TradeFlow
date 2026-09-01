@@ -23,6 +23,9 @@ def register_and_login():
         page.locator("button:has-text('Create Trader Profile')").click()
         
         # UI automatically switches to login view with "Account created! Please log in."
+        # Wait for the switch to happen before filling the password, otherwise we race React's state clear
+        page.locator("button:has-text('Open Blotter')").wait_for(state="visible")
+        
         # The frontend clears the password field, so we must refill it before logging in.
         page.locator("input[type='password']").fill("password123")
         page.locator("button:has-text('Open Blotter')").click()

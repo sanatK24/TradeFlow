@@ -14,7 +14,9 @@ def test_register_new_trader(page, base_url):
     page.locator("input[type='password']").fill("password123")
     page.locator("button:has-text('Create Trader Profile')").click()
     
-    # UI switches to login view after registration, password is cleared by frontend
+    # UI switches to login view after registration, wait for the state transition to finish
+    page.locator("button:has-text('Open Blotter')").wait_for(state="visible")
+    # password is cleared by frontend, so we refill it
     page.locator("input[type='password']").fill("password123")
     page.locator("button:has-text('Open Blotter')").click()
     
