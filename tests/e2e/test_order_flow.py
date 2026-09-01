@@ -16,7 +16,7 @@ def test_place_limit_buy_order(page, base_url, register_and_login):
     page.locator("button:has-text('Client Desk')").click()
     page.wait_for_timeout(2000)
     
-    page.get_by_role("button", name="BUY", exact=True).click()
+    page.get_by_role("button", name="BUY", exact=True).first.click()
     page.locator(".form-group:has-text('Order Type') select").select_option(value="LIMIT")
     
     page.locator("input[placeholder*='e.g. 99.500']").fill("95.000")
