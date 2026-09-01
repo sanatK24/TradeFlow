@@ -19,8 +19,12 @@ def register_and_login():
         page.locator("input[placeholder*='S.Karkhanis']").fill(username)
         page.locator("input[type='password']").fill("password123")
         
-        # Submit
+        # Submit registration
         page.locator("button:has-text('Create Trader Profile')").click()
+        
+        # UI automatically switches to login view with "Account created! Please log in."
+        # We need to click Open Blotter to actually log in. Credentials are still in the form.
+        page.locator("button:has-text('Open Blotter')").click()
         
         # Wait for trading desk to load
         page.wait_for_timeout(2000)

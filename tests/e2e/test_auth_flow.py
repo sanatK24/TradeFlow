@@ -14,6 +14,9 @@ def test_register_new_trader(page, base_url):
     page.locator("input[type='password']").fill("password123")
     page.locator("button:has-text('Create Trader Profile')").click()
     
+    # UI switches to login view after registration, click login
+    page.locator("button:has-text('Open Blotter')").click()
+    
     page.wait_for_timeout(2000)
     expect(page.locator("button:has-text('Client Desk')")).to_be_visible(timeout=10000)
 
