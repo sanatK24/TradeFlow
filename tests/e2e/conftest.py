@@ -1,7 +1,7 @@
 import pytest
 import time
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def base_url():
     return "http://localhost:5173"
 
