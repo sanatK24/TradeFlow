@@ -14,7 +14,8 @@ def test_register_new_trader(page, base_url):
     page.locator("input[type='password']").fill("password123")
     page.locator("button:has-text('Create Trader Profile')").click()
     
-    # UI switches to login view after registration, click login
+    # UI switches to login view after registration, password is cleared by frontend
+    page.locator("input[type='password']").fill("password123")
     page.locator("button:has-text('Open Blotter')").click()
     
     page.wait_for_timeout(2000)

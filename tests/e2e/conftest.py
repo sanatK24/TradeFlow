@@ -23,7 +23,8 @@ def register_and_login():
         page.locator("button:has-text('Create Trader Profile')").click()
         
         # UI automatically switches to login view with "Account created! Please log in."
-        # We need to click Open Blotter to actually log in. Credentials are still in the form.
+        # The frontend clears the password field, so we must refill it before logging in.
+        page.locator("input[type='password']").fill("password123")
         page.locator("button:has-text('Open Blotter')").click()
         
         # Wait for trading desk to load
