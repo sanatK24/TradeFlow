@@ -16,8 +16,8 @@ def test_place_limit_buy_order(page, base_url, register_and_login):
     page.locator("button:has-text('Client Desk')").click()
     page.wait_for_timeout(2000)
     
-    page.locator("button:has-text('BUY')").click()
-    page.locator("select").last.select_option(label="LIMIT ORDER")
+    page.get_by_role("button", name="BUY", exact=True).click()
+    page.locator(".form-group:has-text('Order Type') select").select_option(value="LIMIT")
     
     page.locator("input[placeholder*='e.g. 99.500']").fill("95.000")
     page.locator("input[placeholder*='e.g. 1000']").fill("100")
@@ -30,7 +30,7 @@ def test_place_market_order(page, base_url, register_and_login):
     page.locator("button:has-text('Client Desk')").click()
     page.wait_for_timeout(2000)
     
-    page.locator("select").last.select_option(label="MARKET ORDER")
+    page.locator(".form-group:has-text('Order Type') select").select_option(value="MARKET")
     expect(page.locator("input[placeholder*='e.g. 99.500']")).to_be_disabled()
     
     page.locator("input[placeholder*='e.g. 1000']").fill("100")
